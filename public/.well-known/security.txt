@@ -1,0 +1,4 @@
+Contact: mailto:me@raczcsaba.dev
+Expires: 2027-12-31T23:00:00.000Z
+Preferred-Languages: en, hu
+Canonical: https://cv.raczcsaba.dev/.well-known/security.txt

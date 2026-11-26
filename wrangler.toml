@@ -1,0 +1,19 @@
+name = "cv-raczcsaba"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+CHAT_MODEL = "claude-opus-5-5"
+BUDGET_USD = "10"
+
+# KV: spend tracking, rate limits, contact backups
+[[kv_namespaces]]
+binding = "CV_KV"
+id = "6512d7196bb44b9aa3a155262b2176cb"
+
+[[services]]
+binding = "MAILER"
+service = "cv-mailer"
+
+# Secret (not in git): ANTHROPIC_API_KEY  →  wrangler pages secret put ANTHROPIC_API_KEY

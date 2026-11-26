@@ -1,0 +1,325 @@
+---
+import Base from '../layouts/Base.astro';
+import { person, projects, capabilities, experience, funFacts, stats, marquee, domains, skills } from '../data/profile';
+
+const icons: Record<string, string> = {
+  ai: '<path d="M12 3v3M12 18v3M4.6 6.6l2.1 2.1M17.3 15.3l2.1 2.1M3 12h3M18 12h3M4.6 17.4l2.1-2.1M17.3 8.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/>',
+  cloud: '<path d="M7 18h10a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.1 9.2 4.5 4.5 0 0 0 7 18Z"/>',
+  web: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/>',
+  mobile: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',
+  backend: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+  perf: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>',
+  iot: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
+  music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  chef: '<path d="M6 13.9A4 4 0 0 1 7.5 6a5 5 0 0 1 9 0A4 4 0 0 1 18 13.9V20H6v-6.1ZM6 17h12"/>',
+  home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/>',
+};
+const icon = (k: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[k] ?? icons.ai}</svg>`;
+const capColor: Record<string, string> = { ai: domains.ai.color, cloud: domains.cloud.color, web: domains.web.color, mobile: domains.mobile.color, backend: domains.backend.color, perf: '#ffffff', iot: domains.iot.color };
+
+const graphData = {
+  domains,
+  skills,
+  projects: projects.map((p) => ({ id: p.id, name: p.name, stack: p.stack })),
+};
+const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 'cloud', 'iot'];
+---
+<Base>
+  <div class="progress" aria-hidden="true"></div>
+  <header class="nav" id="nav">
+    <nav class="nav__inner" aria-label="Main">
+      <a href="#top" class="nav__logo" id="logo" aria-label="Home">CR</a>
+      <a class="nav__link opt" href="#work">Work</a>
+      <a class="nav__link opt" href="#stack">Stack</a>
+      <a class="nav__link opt" href="#journey">Journey</a>
+      <a class="nav__link opt" href="#lab">Off-hours</a>
+      <a class="nav__link" href={person.pdf} target="_blank" rel="noopener">CV&nbsp;PDF</a>
+      <a class="btn btn--primary btn--sm nav__cta" href="#contact" data-magnetic>Let’s talk</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero" id="top" aria-label="Intro">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <div class="hero__grid" aria-hidden="true"></div>
+      <div class="hero__canvas" id="graph" aria-hidden="true"></div>
+      <div class="hero__tip" id="graph-tip" role="status" aria-live="polite"></div>
+      <div class="wrap hero__content">
+        <span class="status"><span class="status__dot"></span>{person.available}</span>
+        <h1 class="display">
+          <span class="sr-only">{person.name}, {person.title}. </span>
+          <span class="line" aria-hidden="true"><span style="--i:0">I build</span></span>
+          <span class="line" aria-hidden="true"><span style="--i:1">products that</span></span>
+          <span class="line" aria-hidden="true"><span style="--i:2" class="grad" id="rotator">talk</span><span style="--i:3">,</span></span>
+          <span class="line" aria-hidden="true"><span style="--i:3">ship &amp; scale.</span></span>
+        </h1>
+        <p class="hero__lede">
+          I’m <strong>Csaba Rácz</strong>, a full-stack &amp; AI engineer in Budapest. Voice agents that pick up the phone,
+          apps in the stores, and edge systems that answer in milliseconds. <strong>Architecture to App Store, end to end.</strong>
+        </p>
+        <div class="hero__ctas">
+          <a class="btn btn--primary" href="#work" data-magnetic>
+            See the work
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+          <a class="btn" href={person.pdf} target="_blank" rel="noopener" data-magnetic>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M12 18v-6M9 15l3 3 3-3"/></svg>
+            Download CV
+          </a>
+          <button class="btn" type="button" data-open-bot data-magnetic>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.4A8 8 0 1 1 21 12Z"/></svg>
+            Ask my AI
+          </button>
+        </div>
+        <div class="legend" aria-hidden="true">
+          {Object.values(domains).map((d) => <span><i style={`background:${d.color}`}></i>{d.label}</span>)}
+        </div>
+        <div class="hero__hint" aria-hidden="true">drag the graph · hover a node · <kbd>?</kbd></div>
+      </div>
+      <script type="application/json" id="graph-data" set:html={JSON.stringify(graphData)} />
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        {[0, 1].map(() => marquee.map((m) => <span>{m}</span>))}
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <section class="section" style="padding-bottom:0" aria-label="In numbers">
+      <div class="wrap">
+        <div class="stats reveal">
+          {stats.map((s) => (
+            <div class="stat"><b data-count={s.n} data-suffix={s.suffix}>{s.n}{s.suffix}</b><span>{s.label}</span></div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK -->
+    <section class="section" id="work" aria-labelledby="work-h">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <span class="eyebrow">Selected work</span>
+            <h2 class="h2" id="work-h">Shipped, live, <em>and running.</em></h2>
+          </div>
+          <div class="filters" role="group" aria-label="Filter projects">
+            <button type="button" aria-pressed="true" data-filter="all">All</button>
+            {filterKeys.map((k) => <button type="button" aria-pressed="false" data-filter={k}>{domains[k].label.split(' ·')[0].split(' &')[0]}</button>)}
+          </div>
+        </div>
+        <div class="work" id="work-grid">
+          {projects.map((p, i) => (
+            <button
+              type="button"
+              class:list={['card proj reveal', { 'proj--feat': p.featured }]}
+              style={`--c:${domains[p.domain].color};--d:${i % 3}`}
+              data-project={p.id}
+              data-tags={p.tags.join(' ')}
+              data-stack={p.stack.join('|')}
+            >
+              <span class="proj__visual" aria-hidden="true"></span>
+              <span class="proj__top"><span class="proj__tag">{domains[p.domain].label}</span><span>{p.period}</span></span>
+              <h3>{p.name}</h3>
+              <p>{p.summary}</p>
+              <span class="proj__more">
+                <span class="chips" style="padding:0;margin:0">{p.stack.slice(0, 4).map((s) => <span class="chip">{s}</span>)}</span>
+                <span class="proj__arrow" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <dialog class="sheet" id="sheet" aria-labelledby="sheet-title">
+      <button class="sheet__close" type="button" data-close aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <div class="sheet__inner" id="sheet-body"></div>
+    </dialog>
+    <template id="projects-json" set:html={JSON.stringify(projects.map((p) => ({ ...p, color: domains[p.domain].color, label: domains[p.domain].label })))} />
+
+    <!-- CAPABILITIES -->
+    <section class="section" id="stack" aria-labelledby="stack-h" style="padding-top:40px">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <span class="eyebrow">Capabilities</span>
+            <h2 class="h2" id="stack-h">One engineer, <em>the whole stack.</em></h2>
+          </div>
+          <p class="lead">From SIP trunks to service workers. I pick boring tech where it matters and the sharp new stuff where it pays off.</p>
+        </div>
+        <div class="bento">
+          {capabilities.map((c, i) => (
+            <article class:list={['card cap reveal', c.size === 'xl' && 'cap--xl', c.size === 'wide' && 'cap--wide']} style={`--c:${capColor[c.key]};--d:${i % 3}`}>
+              <div class="cap__icon" set:html={icon(c.key)} />
+              <h3>{c.title}</h3>
+              <p>{c.text}</p>
+              <div class="chips">{c.chips.map((ch) => <span class="chip">{ch}</span>)}</div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNEY -->
+    <section class="section" id="journey" aria-labelledby="journey-h">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <span class="eyebrow">Journey</span>
+            <h2 class="h2" id="journey-h">From the Great Plain <em>to production.</em></h2>
+          </div>
+          <a class="btn" href={person.pdf} target="_blank" rel="noopener" data-magnetic>Full CV as PDF ↗</a>
+        </div>
+        <div class="tl" id="tl">
+          <div class="tl__fill" aria-hidden="true"></div>
+          {experience.map((e) => (
+            <div class="tl__item reveal">
+              <div class="tl__when">{e.when}</div>
+              <div class="tl__body">
+                <h3>{e.title} <small>{e.org}</small></h3>
+                <p>{e.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- LAB -->
+    <section class="section" id="lab" aria-labelledby="lab-h" style="padding-top:20px">
+      <div class="wrap">
+        <div class="section__head">
+          <div>
+            <span class="eyebrow">Off the clock</span>
+            <h2 class="h2" id="lab-h">Hi-fi, hot pans <em>&amp; hot solder.</em></h2>
+          </div>
+          <p class="lead">The side projects are where the main projects get their ideas.</p>
+        </div>
+        <div class="lab">
+          <article class="card fact-deck reveal" aria-live="polite">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div class="eq" aria-hidden="true">{Array.from({ length: 12 }, (_, k) => <i style={`--k:${k}`}></i>)}</div>
+              <span class="mono" style="font-size:12px;color:var(--muted)">fun_facts.flac · 24-bit / 96 kHz</span>
+            </div>
+            <p class="fact" id="fact"><span>{funFacts[0]}</span></p>
+            <div class="fact-deck__ctrl">
+              <button class="btn btn--sm" type="button" id="fact-next" data-magnetic>Next fact →</button>
+              <button class="btn btn--sm" type="button" data-ask="Tell me a fun fact about Csaba that isn't on the site">Ask the bot</button>
+              <span class="fact-deck__count mono" id="fact-count">01 / {String(funFacts.length).padStart(2, '0')}</span>
+            </div>
+            <script type="application/json" id="facts-json" set:html={JSON.stringify(funFacts)} />
+          </article>
+          <div class="labs">
+            <article class="card labitem reveal" style="--d:1;--c:#7dffcf">
+              <div class="cap__icon" set:html={icon('music')} />
+              <div><h4>Lossless everything</h4><p>A DIY ESP32-S3 network speaker and Music Assistant setup, because good audio deserves good plumbing.</p></div>
+            </article>
+            <article class="card labitem reveal" style="--d:2;--c:#c3ff4a">
+              <div class="cap__icon" set:html={icon('home')} />
+              <div><h4>A house that listens</h4><p>Offline Hungarian voice assistant, Home Assistant automations, a Proxmox homelab and a wall-tablet dashboard.</p></div>
+            </article>
+            <article class="card labitem reveal" style="--d:3;--c:#ffbe55">
+              <div class="cap__icon" set:html={icon('chef')} />
+              <div><h4>Weekend chef</h4><p>Slow-cooked Hungarian classics, fermented hot sauces and a strong opinion on paprika sourcing.</p></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact" aria-labelledby="contact-h">
+      <div class="wrap contact">
+        <div>
+          <span class="eyebrow">Contact</span>
+          <h2 class="contact__big" id="contact-h">Got a project <span class="grad">idea?</span></h2>
+          <p class="lead">Hiring, a freelance build, or just a wild idea for a voice agent — tell me. Not sure how to phrase it? My AI will draft it with you and fill in the form.</p>
+          <a class="mail" href={`mailto:${person.email}`} id="mail">{person.email} <span aria-hidden="true">↗</span></a>
+          <div class="socials">
+            <a class="btn btn--sm" href={person.github} target="_blank" rel="noopener me">GitHub</a>
+            <a class="btn btn--sm" href={person.pdf} target="_blank" rel="noopener">CV (PDF)</a>
+            <button class="btn btn--sm" type="button" data-ask="I have a project idea, can you help me shape it?">Draft it with AI</button>
+          </div>
+        </div>
+        <form class="card form" id="contact-form" novalidate>
+          <div class="row2">
+            <div class="field"><label for="f-name">name</label><input id="f-name" name="name" autocomplete="name" required maxlength="120" /></div>
+            <div class="field"><label for="f-email">email</label><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="200" /></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="f-company">company (optional)</label><input id="f-company" name="company" autocomplete="organization" maxlength="160" /></div>
+            <div class="field">
+              <label for="f-type">what is it?</label>
+              <select id="f-type" name="type">
+                <option>Job opportunity</option>
+                <option>Freelance project</option>
+                <option>AI / voice agent</option>
+                <option>Web or mobile app</option>
+                <option>Just saying hi</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label for="f-msg">message</label><textarea id="f-msg" name="message" required maxlength="5000" placeholder="What are you building, and where could I help?"></textarea></div>
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <div class="form__foot">
+            <span class="form__note" id="form-note">Goes straight to my inbox. No newsletter, ever.</span>
+            <button class="btn btn--primary" type="submit" data-magnetic>Send message →</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <span>© {new Date().getFullYear()} {person.name} · Budapest</span>
+      <span>Astro · Three.js · Cloudflare Pages · Claude &nbsp;·&nbsp; <a href="https://github.com/raczcsaba/cv.raczcsaba.dev" target="_blank" rel="noopener">source</a> · <a href="/llms.txt">llms.txt</a></span>
+    </div>
+  </footer>
+
+  <!-- BOT -->
+  <div class="bot" id="bot">
+    <div class="bubble" id="bubble" role="status" aria-live="polite"></div>
+    <section class="chat" id="chat" aria-label="Chat with Csaba's AI" aria-hidden="true">
+      <div class="chat__head">
+        <div class="chat__avatar" aria-hidden="true"></div>
+        <div><b>Bitsy</b><small>Csaba’s AI · knows his whole story</small></div>
+        <button class="chat__x" type="button" id="chat-close" aria-label="Close chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="chat__log" id="chat-log"></div>
+      <div class="chat__chips" id="chat-chips">
+        <button type="button">What’s his strongest skill?</button>
+        <button type="button">I have a project idea</button>
+        <button type="button">Tell me about the voice AI work</button>
+        <button type="button">Is he available?</button>
+        <button type="button">Fun fact, please</button>
+      </div>
+      <form class="chat__form" id="chat-form">
+        <label class="sr-only" for="chat-input">Message</label>
+        <textarea id="chat-input" rows="1" maxlength="1200" placeholder="Ask anything, or pitch an idea…"></textarea>
+        <button class="chat__send" type="submit" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </section>
+    <button class="bot__orb" id="orb" type="button" aria-label="Open chat with Csaba's AI" aria-expanded="false" aria-controls="chat">
+      <span class="bot__face" aria-hidden="true">
+        <span class="bot__eye bot__eye--l"></span><span class="bot__eye bot__eye--r"></span>
+        <span class="bot__cheek bot__cheek--l"></span><span class="bot__cheek bot__cheek--r"></span>
+        <span class="bot__mouth"></span>
+      </span>
+      <span class="bot__badge" id="orb-badge">1</span>
+    </button>
+  </div>
+
+  <script>
+    import '../scripts/main';
+  </script>
+</Base>

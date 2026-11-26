@@ -1,0 +1,10 @@
+/* TEAM */
+Developer: Csaba Rácz (Rácz Csaba)
+Contact: me@raczcsaba.dev
+From: Budapest, Hungary
+GitHub: https://github.com/raczcsaba
+
+/* SITE */
+Stack: Astro, TypeScript, Three.js, Cloudflare Pages + Functions, Claude API
+Fonts: Inter, JetBrains Mono
+Easter eggs: yes. Press ? to get a hint.

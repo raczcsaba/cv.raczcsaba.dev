@@ -1,0 +1,38 @@
+---
+import { person, stats } from '../data/profile';
+---
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="robots" content="noindex" /><title>og</title>
+<style>
+  @font-face { font-family: Inter; src: url(/fonts/inter-latin-wght-normal.woff2) format('woff2'); font-weight: 100 900; }
+  @font-face { font-family: Inter; src: url(/fonts/inter-latin-ext-wght-normal.woff2) format('woff2'); font-weight: 100 900; unicode-range: U+0100-02AF; }
+  @font-face { font-family: JB; src: url(/fonts/jetbrains-mono-latin-wght-normal.woff2) format('woff2'); font-weight: 100 900; }
+  * { margin: 0; box-sizing: border-box; }
+  body { width: 1200px; height: 630px; overflow: hidden; background: #06070a; color: #f2f4f8; font-family: Inter, sans-serif; position: relative; padding: 72px 80px; }
+  .glow { position: absolute; inset: -30%; background: radial-gradient(circle at 78% 40%, #c3ff4a33, transparent 30%), radial-gradient(circle at 88% 70%, #52e3ff2e, transparent 32%), radial-gradient(circle at 60% 90%, #9b8cff22, transparent 30%); }
+  .grid { position: absolute; inset: 0; background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 48px 48px; }
+  .dots { position: absolute; right: 60px; top: 60px; width: 470px; height: 510px; }
+  .k { font: 600 22px JB, monospace; color: #c3ff4a; letter-spacing: .06em; position: relative; }
+  h1 { font-size: 92px; line-height: .98; letter-spacing: -.045em; font-weight: 800; margin-top: 26px; position: relative; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, #c3ff4a, #52e3ff 60%, #9b8cff); -webkit-background-clip: text; color: transparent; }
+  p { position: relative; font-size: 28px; color: #9aa3b2; margin-top: 28px; max-width: 640px; line-height: 1.35; }
+  .row { position: absolute; left: 80px; bottom: 64px; display: flex; gap: 14px; }
+  .row span { font: 600 20px JB, monospace; padding: 10px 18px; border: 1px solid #ffffff22; border-radius: 99px; background: #ffffff0a; }
+</style></head>
+<body>
+  <div class="glow"></div><div class="grid"></div>
+  <svg class="dots" viewBox="0 0 470 510" id="dots"></svg>
+  <div class="k">cv.raczcsaba.dev</div>
+  <h1>{person.name}<br /><em>talks, ships, scales.</em></h1>
+  <p>{person.title}: voice AI agents, RAG, SSR web, mobile apps and edge infrastructure.</p>
+  <div class="row">{stats.slice(0, 3).map((s) => <span>{s.n}{s.suffix} {s.label.split(" ").slice(0, 2).join(" ")}</span>)}</div>
+  <script is:inline>
+    const svg = document.getElementById('dots'), c = ['#c3ff4a', '#52e3ff', '#9b8cff', '#ff6fae', '#ffbe55', '#7dffcf'];
+    let seed = 7; const r = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const pts = Array.from({ length: 70 }, (_, i) => { const a = r() * 6.283, d = Math.sqrt(r()) * 220; return [235 + Math.cos(a) * d, 255 + Math.sin(a) * d * 1.05, c[i % 6], 2 + r() * 6]; });
+    let h = '';
+    for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) { const dx = pts[i][0] - pts[j][0], dy = pts[i][1] - pts[j][1]; if (dx * dx + dy * dy < 4200) h += `<line x1="${pts[i][0]}" y1="${pts[i][1]}" x2="${pts[j][0]}" y2="${pts[j][1]}" stroke="${pts[i][2]}" stroke-opacity=".22"/>`; }
+    for (const p of pts) h += `<circle cx="${p[0]}" cy="${p[1]}" r="${p[3] * 2.4}" fill="${p[2]}" opacity=".12"/><circle cx="${p[0]}" cy="${p[1]}" r="${p[3]}" fill="${p[2]}"/>`;
+    svg.innerHTML = h;
+  </script>
+</body></html>
