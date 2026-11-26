@@ -1,11 +1,18 @@
 ---
 import { SITE, person, projects, experience, skills, domains, type DomainKey } from '../data/profile';
-const featured = projects.filter((p) => p.featured);
-const other = projects.filter((p) => !p.featured);
-const byDomain = (Object.keys(domains) as DomainKey[]).map((d) => ({
+// CV lead projects: the site's featured ones plus two strong team / backend roles
+const lead = new Set(['vybex', 'voice-ordering', 'abigel', 'booking']);
+const featured = projects.filter((p) => lead.has(p.id));
+const isSide = (p: (typeof projects)[number]) => /side|open source/i.test(p.client);
+const other = projects.filter((p) => !lead.has(p.id) && !isSide(p));
+const side = projects.filter((p) => !lead.has(p.id) && isSide(p));
+const order: DomainKey[] = ['ai', 'backend', 'web', 'mobile', 'cloud', 'iot'];
+const byDomain = order.map((d) => ({
   label: domains[d].label,
-  items: skills.filter((s) => s.d === d && s.level >= 3).sort((a, b) => b.level - a.level).map((s) => s.name),
+  items: skills.filter((s) => s.d === d && s.level >= 3).sort((a, b) => b.level - a.level),
 }));
+const work = experience.filter((e) => !/qualification|school/i.test(e.title));
+const edu = experience.filter((e) => /qualification|school/i.test(e.title));
 const title = `${person.name} · CV · ${person.title}`;
 ---
 <!doctype html>
@@ -37,6 +44,7 @@ const title = `${person.name} · CV · ${person.title}`;
     .lede { margin: 4mm 0 1mm; font-size: 10pt; color: #2b2f36; max-width: 165mm; }
     .cols { display: grid; grid-template-columns: 1fr 56mm; gap: 8mm; margin-top: 4mm; }
     h2 { font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: #6b7280; margin: 4mm 0 2mm; display: flex; align-items: center; gap: 2mm; }
+    h2 { break-after: avoid; }
     h2::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
     .item { break-inside: avoid; margin-bottom: 2.6mm; }
     .item h3 { font-size: 9.8pt; font-weight: 700; display: flex; justify-content: space-between; gap: 3mm; }
@@ -46,11 +54,18 @@ const title = `${person.name} · CV · ${person.title}`;
     .item li { margin: .3mm 0; }
     .stack { font-size: 7.8pt; color: #4b5563; margin-top: .6mm; }
     .stack i { font-style: normal; display: inline-block; padding: .2mm 1.6mm; border: 1px solid #e5e7eb; border-radius: 99px; margin: .4mm .6mm 0 0; }
-    aside .group { margin-bottom: 2.8mm; break-inside: avoid; }
-    aside .group b { display: block; font-size: 8.4pt; margin-bottom: .6mm; }
+    aside .group { margin-bottom: 2.6mm; break-inside: avoid; }
+    aside .group b { display: block; font-size: 8.4pt; margin-bottom: .8mm; }
     aside .group p { font-size: 8.2pt; color: #374151; }
-    .more li { font-size: 8.4pt; margin-bottom: 1mm; list-style: none; }
-    .more li b { font-weight: 650; }
+    aside .group small { display: block; font-size: 7.6pt; color: #6b7280; }
+    .skills { display: flex; flex-wrap: wrap; gap: .8mm; }
+    .skills i { font-style: normal; white-space: nowrap; font-size: 7.6pt; line-height: 1.3; padding: .25mm 1.5mm; border-radius: 99px; background: #f3f4f6; color: #374151; }
+    .skills i.top { background: #15171c; color: #fff; }
+    .legend { font-size: 7pt; color: #9ca3af; margin: -1mm 0 2mm; }
+    .more { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
+    .more .item { margin-bottom: 2.4mm; }
+    .more .item p.sum { font-size: 8.6pt; }
+    .more .stack { margin-top: .3mm; }
     .bar { position: fixed; top: 14px; right: 14px; display: flex; gap: 8px; }
     .bar a { font: 600 13px Inter, sans-serif; padding: 9px 14px; border-radius: 99px; background: #15171c; color: #c3ff4a; }
     .bar a + a { background: #fff; color: #15171c; border: 1px solid #d1d5db; }
@@ -63,7 +78,7 @@ const title = `${person.name} · CV · ${person.title}`;
     <header>
       <div>
         <h1>{person.name}</h1>
-        <p class="role"><b>{person.title}</b> · Voice AI · Agents · Web · Mobile · Edge</p>
+        <p class="role"><b>{person.title}</b> · Voice AI · Web · Mobile · Edge</p>
       </div>
       <div class="contact">
         <b><a href={`mailto:${person.email}`}>{person.email}</a></b><br />
@@ -77,7 +92,7 @@ const title = `${person.name} · CV · ${person.title}`;
     <div class="cols">
       <section>
         <h2>Experience</h2>
-        {experience.slice(0, 3).map((e) => (
+        {work.map((e) => (
           <div class="item"><h3>{e.title}<span>{e.when}</span></h3><p class="meta">{e.org}</p><p>{e.text}</p></div>
         ))}
         <h2>Selected projects</h2>
@@ -85,20 +100,43 @@ const title = `${person.name} · CV · ${person.title}`;
           <div class="item">
             <h3>{p.name}<span>{p.period}</span></h3>
             <p class="meta">{p.client} · {p.role}</p>
-            <ul>{p.highlights.slice(0, 2).map((h) => <li>{h}</li>)}</ul>
+            <ul>{p.highlights.slice(0, 3).map((h) => <li>{h}</li>)}</ul>
             <p class="stack">{p.stack.slice(0, 7).map((s) => <i>{s}</i>)}</p>
           </div>
         ))}
       </section>
       <aside>
         <h2>Skills</h2>
-        {byDomain.map((g) => <div class="group"><b>{g.label}</b><p>{g.items.join(' · ')}</p></div>)}
-        <h2>Also built</h2>
-        <ul class="more">{other.slice(0, 8).map((p) => <li><b>{p.name}</b>: {p.summary.split('.')[0]}.</li>)}</ul>
+        <p class="legend">Dark = daily driver</p>
+        {byDomain.map((g) => (
+          <div class="group"><b>{g.label}</b><p class="skills">{g.items.map((s) => <i class:list={{ top: s.level >= 5 }}>{s.name}</i>)}</p></div>
+        ))}
         <h2>Education</h2>
-        {experience.slice(3).map((e) => <div class="group"><b>{e.title}</b><p>{e.org}</p></div>)}
+        {edu.map((e) => <div class="group"><b>{e.title}</b><p>{e.org}</p>{/^\d/.test(e.when) && <small>{e.when}</small>}</div>)}
       </aside>
     </div>
+    <h2>More client projects</h2>
+    <section class="more">
+      {other.map((p) => (
+        <div class="item">
+          <h3>{p.name}<span>{p.period}</span></h3>
+          <p class="meta">{p.client} · {p.role}</p>
+          <p class="sum">{p.summary}</p>
+          <p class="stack">{p.stack.slice(0, 6).map((s) => <i>{s}</i>)}</p>
+        </div>
+      ))}
+    </section>
+    <h2>Side projects & open source</h2>
+    <section class="more">
+      {side.map((p) => (
+        <div class="item">
+          <h3>{p.name}<span>{p.period}</span></h3>
+          <p class="meta">{p.client} · {p.role}</p>
+          <p class="sum">{p.summary}</p>
+          <p class="stack">{p.stack.slice(0, 6).map((s) => <i>{s}</i>)}</p>
+        </div>
+      ))}
+    </section>
     <footer><span>Interactive version, live AI assistant and all projects: {SITE.replace('https://', '')}</span><span>{new Date().getFullYear()}</span></footer>
   </main>
 </body>

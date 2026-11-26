@@ -287,5 +287,5 @@ export function initBot(o: typeof api) {
     if ((e.target as Element).closest?.('[data-open-bot]')) openChat();
   });
   if (history.length) badge.hidden = true;
-  setTimeout(() => { if (!open && !seen.has('work')) botSay('Hi! I’m Bitsy, Csaba’s AI. Drag the graph, or ask me anything. ✨', 6000, 'happy'); }, 2600);
+  setTimeout(() => { if (!open && !seen.has('work') && innerWidth > 640) botSay('Hi! I’m Bitsy, Csaba’s AI. Drag the graph, or ask me anything. ✨', 6000, 'happy'); }, 2600);
 }

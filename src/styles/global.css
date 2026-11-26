@@ -675,3 +675,9 @@ html.synth body { animation: hue 8s linear infinite; }
 /* view transitions */
 @view-transition { navigation: auto; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
+
+/* touch targets on phones */
+@media (pointer: coarse), (max-width: 640px) {
+  .chat__x { width: 44px; height: 44px; }
+  .chat__chips button { min-height: 38px; padding: 8px 13px; }
+}
