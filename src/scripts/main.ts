@@ -183,20 +183,76 @@ function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
   const card = $('#book-card');
   picker($('.shelf__rack'), '.spine', (i) => {
     const b = books[i];
+    card.style.setProperty('--bc', (b as Book & { color: string }).color);
     card.innerHTML = `<span class="mono shelf__meta">${esc(b.author)} · ${esc(String(b.year))}</span><h3>${esc(b.title)}</h3><p class="shelf__hu">${esc(b.hu)}</p><p class="shelf__note">${esc(b.note)}</p>`;
   });
 }
 {
   type Rec = { track: string; artist: string; genre: string; color: string };
   const recs: Rec[] = JSON.parse($('#records-json').textContent!);
-  const big = $('#disc-big'), info = $('#rec-track').parentElement!;
-  picker($('.crate__row'), '.crate__item', (i) => {
+  const crate = $('#crate'), row = $('#cf-row'), info = $('.player__info');
+  const items = $$<HTMLButtonElement>('.cf__item', row);
+  const play = $<HTMLAnchorElement>('#rec-play');
+  const n = items.length;
+  let cur = -1, spread = reduced ? 1 : 0, raf = 0;
+
+  const centerOf = (i: number) => items[i].offsetLeft + items[i].offsetWidth / 2 - row.clientWidth / 2;
+  const go = (i: number, smooth = true) => row.scrollTo({ left: centerOf((i + n) % n), behavior: smooth && !reduced ? 'smooth' : 'auto' });
+
+  function select(i: number) {
+    if (i === cur) return;
+    cur = i;
     const r = recs[i];
-    big.style.setProperty('--dc', r.color);
-    big.animate([{ transform: 'scale(0.6) rotate(-90deg)', opacity: 0.2 }, { transform: 'scale(1) rotate(0)', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(0.16,0.84,0.3,1)' });
-    const q = encodeURIComponent(`${r.artist.split(' · ')[0]} ${r.track}`);
-    info.innerHTML = `<span class="mono shelf__meta">Now spinning · ${esc(r.genre)}</span><h3>${esc(r.track)}</h3><p class="shelf__hu">${esc(r.artist)}</p><a class="btn btn--sm" target="_blank" rel="noopener" href="https://tidal.com/search?q=${q}">Find on Tidal ↗</a>`;
+    items.forEach((b, k) => b.setAttribute('aria-selected', String(k === i)));
+    crate.style.setProperty('--cur', r.color);
+    crate.style.setProperty('--prog', `${((i + 1) / n) * 100}%`);
+    $('#rec-genre').textContent = `Now spinning · ${r.genre}`;
+    $('#rec-track').textContent = r.track;
+    $('#rec-artist').textContent = r.artist;
+    $('#rec-pos').textContent = `${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}`;
+    info.classList.remove('swap'); void info.offsetWidth; info.classList.add('swap');
+    play.href = `https://tidal.com/search?q=${encodeURIComponent(`${r.artist.split(' · ')[0]} ${r.track}`)}`;
+    play.setAttribute('aria-label', `Play ${r.track} on Tidal`);
+  }
+
+  function layout() {
+    raf = 0;
+    if (!reduced) { // stack -> fan out as the card scrolls into view
+      const top = crate.getBoundingClientRect().top;
+      spread = Math.min(1, Math.max(0, (innerHeight * 0.95 - top) / (innerHeight * 0.55)));
+    }
+    const mid = row.scrollLeft + row.clientWidth / 2;
+    const step = items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : 1;
+    let best = 0, bestD = Infinity;
+    items.forEach((el, k) => {
+      const d = (el.offsetLeft + el.offsetWidth / 2 - mid) / step;
+      const a = Math.abs(d);
+      if (a < bestD) { bestD = a; best = k; }
+      const c = Math.min(a, 3);
+      const pile = -d * step * (1 - spread);              // all discs collapse onto the centre one
+      const ease = Math.sign(d) * Math.min(a, 1) * -step * 0.12; // tuck neighbours slightly behind
+      el.style.transform = `translateX(${pile + ease}px) translateZ(${-c * 90}px) rotateY(${Math.max(-1, Math.min(1, d)) * -38 * spread}deg) scale(${1 - c * 0.08})`;
+      el.style.zIndex = String(100 - Math.round(a * 10));
+      el.style.filter = `brightness(${1 - c * 0.22})`;
+      el.style.opacity = String(a > 3.6 ? 0 : 1);
+    });
+    select(best);
+  }
+  const queue = () => { if (!raf) raf = requestAnimationFrame(layout); };
+  row.addEventListener('scroll', queue, { passive: true });
+  addEventListener('scroll', queue, { passive: true });
+  addEventListener('resize', () => { go(cur, false); queue(); });
+
+  items.forEach((b, k) => b.addEventListener('click', () => (k === cur ? play.click() : go(k))));
+  $('#rec-prev').addEventListener('click', () => go(cur - 1));
+  $('#rec-next').addEventListener('click', () => go(cur + 1));
+  row.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+    else if (e.key === 'Enter' && e.target === row) play.click();
   });
+  go(Math.floor(n / 2), false);
+  layout();
 }
 
 /* ---------- contact form ---------- */

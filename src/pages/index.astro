@@ -239,14 +239,14 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
             <div class="shelf__rack" role="listbox" aria-label="Favourite books">
               {books.map((b, i) => (
                 <button class="spine" type="button" role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i}
-                  style={`--bc:${b.color};--bi:${'ink' in b ? b.ink : '#f3efe6'};--bh:${b.h};--bw:${Math.max(34, Math.min(52, 26 + b.title.length))}px`}
+                  style={`--bc:${b.color};--bh:${b.h};--bw:${Math.max(34, Math.min(52, 26 + b.title.length))}px`}
                   aria-label={`${b.title} by ${b.author}`}>
                   <span class="spine__t">{b.title}</span>
                   <span class="spine__a">{b.author.split(' ').slice(-1)[0]}</span>
                 </button>
               ))}
             </div>
-            <article class="shelf__card" id="book-card" aria-live="polite">
+            <article class="shelf__card" id="book-card" aria-live="polite" style={`--bc:${books[0].color}`}>
               <span class="mono shelf__meta" id="book-meta">{books[0].author} · {books[0].year}</span>
               <h3 id="book-title">{books[0].title}</h3>
               <p class="shelf__hu" id="book-hu">{books[0].hu}</p>
@@ -259,24 +259,29 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
         <div class="crate card reveal" id="crate">
           <div class="shelf__head">
             <span class="eyebrow">Record crate</span>
-            <span class="mono shelf__hint">from his Tidal favourites · lossless, obviously</span>
+            <span class="mono shelf__hint">from his Tidal favourites · swipe or use the controls</span>
           </div>
-          <div class="crate__now" aria-live="polite">
-            <div class="crate__deck" aria-hidden="true"><div class="disc disc--big" id="disc-big" style={`--dc:${records[0].color}`}><i></i></div></div>
-            <div>
-              <span class="mono shelf__meta" id="rec-genre">Now spinning · {records[0].genre}</span>
-              <h3 id="rec-track">{records[0].track}</h3>
-              <p class="shelf__hu" id="rec-artist">{records[0].artist}</p>
-              <a class="btn btn--sm" id="rec-link" target="_blank" rel="noopener" href={`https://tidal.com/search?q=${encodeURIComponent(records[0].artist.split(' · ')[0] + ' ' + records[0].track)}`}>Find on Tidal ↗</a>
+          <div class="cf">
+            <div class="cf__row" id="cf-row" role="listbox" aria-label="Favourite tracks" tabindex="0">
+              {records.map((r, i) => (
+                <button class="cf__item" type="button" role="option" tabindex="-1" aria-selected="false" data-i={i} style={`--dc:${r.color}`} aria-label={`${r.track} by ${r.artist}`}>
+                  <span class="disc"><i></i></span>
+                </button>
+              ))}
             </div>
           </div>
-          <div class="crate__row" role="listbox" aria-label="Favourite tracks">
-            {records.map((r, i) => (
-              <button class="crate__item" type="button" role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i} style={`--dc:${r.color}`} aria-label={`${r.track} by ${r.artist}`}>
-                <span class="disc"><i></i></span>
-                <span class="crate__label"><b>{r.track}</b><small>{r.artist}</small></span>
-              </button>
-            ))}
+          <div class="player" aria-live="polite">
+            <div class="player__info">
+              <span class="mono shelf__meta" id="rec-genre">&nbsp;</span>
+              <h3 id="rec-track">&nbsp;</h3>
+              <p class="shelf__hu" id="rec-artist">&nbsp;</p>
+            </div>
+            <div class="player__bar" aria-hidden="true"><i id="rec-bar"></i><span class="mono" id="rec-pos">01 / {String(records.length).padStart(2, '0')}</span></div>
+            <div class="player__ctrl">
+              <button class="pbtn" type="button" id="rec-prev" aria-label="Previous track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+              <a class="pbtn pbtn--play" id="rec-play" target="_blank" rel="noopener" href="https://tidal.com" aria-label="Play on Tidal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></a>
+              <button class="pbtn" type="button" id="rec-next" aria-label="Next track"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM4 5v14l11-7z"/></svg></button>
+            </div>
           </div>
           <script type="application/json" id="records-json" set:html={JSON.stringify(records)} />
         </div>

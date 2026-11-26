@@ -551,37 +551,43 @@ export const funFacts = [
 
 /** Bookshelf: favourite books (hu = the title he read it under; original title when no Hungarian one is known). */
 export const books = [
-  { title: 'The Prince', hu: 'A fejedelem', author: 'Niccolò Machiavelli', year: 1532, color: '#8a2c2c', h: 92, note: 'The original handbook on power and incentives. Surprisingly useful for reading org charts.' },
-  { title: 'Thinking, Fast and Slow', hu: 'Gyors és lassú gondolkodás', author: 'Daniel Kahneman', year: 2011, color: '#e8e2cf', ink: '#1a1a1a', h: 100, note: 'System 1 vs System 2. Why he writes the estimate down before the meeting, not during it.' },
-  { title: 'Thus Spoke Zarathustra', hu: 'Így szólott Zarathustra', author: 'Friedrich Nietzsche', year: 1883, color: '#2b3a55', h: 96, note: 'Become who you are. Also a strong argument for rewriting things you have outgrown.' },
-  { title: 'No Longer Human', hu: 'Ningen shikkaku', author: 'Osamu Dazai', year: 1948, color: '#c9c3b8', ink: '#2a2a2a', h: 84, note: 'A quiet, devastating Japanese classic about masks and belonging. Read it once, think about it for years.' },
-  { title: 'Meditations', hu: 'Elmélkedések', author: 'Marcus Aurelius', year: 'c. 180', color: '#5b4a33', h: 90, note: 'A Roman emperor’s private notes on staying calm. The best incident-response manual ever written.' },
-  { title: 'Steppenwolf', hu: 'A pusztai farkas', author: 'Hermann Hesse', year: 1927, color: '#3e5b3a', h: 94, note: 'The outsider and the bourgeois in one person. Plus a magic theatre, which is roughly what a homelab is.' },
-  { title: 'Tao Te Ching', hu: 'Tao te king', author: 'Laozi', year: 'c. 400 BC', color: '#1d1d1d', h: 78, note: 'Water beats stone by not fighting it. The quiet case for simple, flexible architecture.' },
-  { title: 'Credit', hu: 'Hitel', author: 'István Széchenyi', year: 1830, color: '#6b1f2f', h: 98, note: 'Hungary’s founding text on modernisation: build the infrastructure, then trust follows.' },
-  { title: 'The Five Geniuses', hu: 'Az öt géniusz', author: 'Béla Hamvas', year: 1948, color: '#2f4f4f', h: 82, note: 'Hamvas on the spirits of places and people. The reason he looks at a city like a system.' },
-  { title: 'The Philosophy of Wine', hu: 'A bor filozófiája', author: 'Béla Hamvas', year: 1945, color: '#5a1e3c', h: 80, note: 'A cheerful prayer-book for drinkers, written in the middle of a war. Joy as a discipline.' },
-  { title: 'The Concept of Anxiety', hu: 'A szorongás fogalma', author: 'Søren Kierkegaard', year: 1844, color: '#44475a', h: 92, note: 'Anxiety as the dizziness of freedom. Every blank repo feels a bit like this.' },
-  { title: 'Beyond the Pleasure Principle', hu: 'Halál- és életösztönök', author: 'Sigmund Freud', year: 1920, color: '#7a5c2e', h: 88, note: 'Freud on the drives that build and the ones that break. Classic, odd and very readable.' },
-  { title: 'Sun and Steel', hu: 'Nap és vas', author: 'Yukio Mishima', year: 1968, color: '#b8462e', h: 76, note: 'An essay on words versus the body. The argument for leaving the desk and going to the gym.' },
+  { title: 'The Prince', hu: 'A fejedelem', author: 'Niccolò Machiavelli', year: 1532, color: '#c3ff4a', h: 92, note: 'The original handbook on power and incentives. Surprisingly useful for reading org charts.' },
+  { title: 'Thinking, Fast and Slow', hu: 'Gyors és lassú gondolkodás', author: 'Daniel Kahneman', year: 2011, color: '#52e3ff', h: 100, note: 'System 1 vs System 2. Why he writes the estimate down before the meeting, not during it.' },
+  { title: 'Thus Spoke Zarathustra', hu: 'Így szólott Zarathustra', author: 'Friedrich Nietzsche', year: 1883, color: '#9b8cff', h: 96, note: 'Become who you are. Also a strong argument for rewriting things you have outgrown.' },
+  { title: 'No Longer Human', hu: 'Ningen shikkaku', author: 'Osamu Dazai', year: 1948, color: '#ff6fae', h: 84, note: 'A quiet, devastating Japanese classic about masks and belonging. Read it once, think about it for years.' },
+  { title: 'Meditations', hu: 'Elmélkedések', author: 'Marcus Aurelius', year: 'c. 180', color: '#ffbe55', h: 90, note: 'A Roman emperor’s private notes on staying calm. The best incident-response manual ever written.' },
+  { title: 'Steppenwolf', hu: 'A pusztai farkas', author: 'Hermann Hesse', year: 1927, color: '#7dffcf', h: 94, note: 'The outsider and the bourgeois in one person. Plus a magic theatre, which is roughly what a homelab is.' },
+  { title: 'Tao Te Ching', hu: 'Tao te king', author: 'Laozi', year: 'c. 400 BC', color: '#c3ff4a', h: 78, note: 'Water beats stone by not fighting it. The quiet case for simple, flexible architecture.' },
+  { title: 'Credit', hu: 'Hitel', author: 'István Széchenyi', year: 1830, color: '#52e3ff', h: 98, note: 'Hungary’s founding text on modernisation: build the infrastructure, then trust follows.' },
+  { title: 'The Five Geniuses', hu: 'Az öt géniusz', author: 'Béla Hamvas', year: 1948, color: '#9b8cff', h: 82, note: 'Hamvas on the spirits of places and people. The reason he looks at a city like a system.' },
+  { title: 'The Philosophy of Wine', hu: 'A bor filozófiája', author: 'Béla Hamvas', year: 1945, color: '#ff6fae', h: 80, note: 'A cheerful prayer-book for drinkers, written in the middle of a war. Joy as a discipline.' },
+  { title: 'The Concept of Anxiety', hu: 'A szorongás fogalma', author: 'Søren Kierkegaard', year: 1844, color: '#ffbe55', h: 92, note: 'Anxiety as the dizziness of freedom. Every blank repo feels a bit like this.' },
+  { title: 'Beyond the Pleasure Principle', hu: 'Halál- és életösztönök', author: 'Sigmund Freud', year: 1920, color: '#7dffcf', h: 88, note: 'Freud on the drives that build and the ones that break. Classic, odd and very readable.' },
+  { title: 'Sun and Steel', hu: 'Nap és vas', author: 'Yukio Mishima', year: 1968, color: '#c3ff4a', h: 76, note: 'An essay on words versus the body. The argument for leaving the desk and going to the gym.' },
 ] as const;
 
-/** Record crate: favourite tracks from his Tidal library. */
+/** Record crate: hi-fi picks from his Tidal library (lossless / Masters). */
 export const records = [
+  { track: 'Touch', artist: 'Daft Punk · Paul Williams', genre: 'Electronic · Random Access Memories', color: '#c3ff4a' },
+  { track: 'Autobahn', artist: 'Kraftwerk', genre: 'Krautrock · 1974', color: '#52e3ff' },
+  { track: 'Bird on the Wire', artist: 'Leonard Cohen', genre: 'Singer-songwriter', color: '#ffbe55' },
+  { track: 'The Last Ship', artist: 'Sting', genre: 'Folk · The Last Ship', color: '#7dffcf' },
+  { track: 'The Great Gig in the Sky', artist: 'Pink Floyd', genre: 'Prog · The Dark Side of the Moon', color: '#9b8cff' },
+  { track: 'Blue Train', artist: 'John Coltrane', genre: 'Jazz · Blue Note, 1957', color: '#6aa8ff' },
+  { track: 'Music for 18 Musicians', artist: 'Steve Reich', genre: 'Minimalism', color: '#ff6fae' },
+  { track: 'Stars', artist: 'Sara K.', genre: 'Audiophile jazz · the classic test track', color: '#e8c27a' },
+  { track: 'Einstein on the Beach: Bed', artist: 'Philip Glass Ensemble', genre: 'Minimalism · opera', color: '#52e3ff' },
+  { track: 'Lux Aeterna', artist: 'Kronos Quartet · Clint Mansell', genre: 'Strings · Requiem for a Dream', color: '#ff5a5a' },
+  { track: 'String Quartet No. 8, Op. 110', artist: 'Shostakovich · Brodsky Quartet', genre: 'Chamber', color: '#c3ff4a' },
+  { track: 'Vocalise, Op. 34 No. 14', artist: 'Rachmaninoff · New York Philharmonic', genre: 'Classical', color: '#b4a0ff' },
+  { track: 'Symphony No. 9 “From the New World”: IV', artist: 'Dvořák · Berliner Philharmoniker, Kubelík', genre: 'Classical', color: '#ffbe55' },
+  { track: '…And They Have Escaped the Weight of Darkness', artist: 'Ólafur Arnalds', genre: 'Modern classical', color: '#7dffcf' },
+  { track: 'Jack of Speed', artist: 'Steely Dan', genre: 'Jazz-rock · Two Against Nature', color: '#ff9f5a' },
+  { track: 'Sinnerman', artist: 'Nina Simone', genre: 'Jazz · soul', color: '#ff6fae' },
+  { track: 'A Hard Rain’s A-Gonna Fall', artist: 'Bob Dylan', genre: 'Folk', color: '#d9b38c' },
+  { track: 'Space Oddity', artist: 'David Bowie', genre: 'Art rock', color: '#9b8cff' },
   { track: 'A Hero’s Death', artist: 'Fontaines D.C.', genre: 'Post-punk', color: '#ff5a36' },
-  { track: 'Vocalise, Op. 34 No. 14', artist: 'Rachmaninoff · New York Philharmonic', genre: 'Classical', color: '#9b8cff' },
-  { track: 'Az egyik ember…', artist: 'Quimby', genre: 'Hungarian alt', color: '#ffbe55' },
-  { track: 'Lost in Paris', artist: 'Tom Misch', genre: 'Neo-soul', color: '#52e3ff' },
-  { track: 'California Dreamin’', artist: 'The Mamas & The Papas', genre: '60s', color: '#ffd84a' },
-  { track: 'Primavera', artist: 'Ludovico Einaudi', genre: 'Modern classical', color: '#7dffcf' },
-  { track: 'Tiszai pu', artist: 'Kispál és a Borz', genre: 'Hungarian rock', color: '#c3ff4a' },
-  { track: 'Golden Skans', artist: 'Klaxons', genre: 'Indie', color: '#ff6fae' },
-  { track: 'L’estate: Allegro non molto', artist: 'Vivaldi · La Serenissima', genre: 'Baroque', color: '#e8c27a' },
-  { track: 'Better Give U Up', artist: 'FKJ', genre: 'Electronic', color: '#6aa8ff' },
-  { track: 'Bujkáló', artist: 'Szabó Balázs Bandája', genre: 'Hungarian folk-pop', color: '#ff9f5a' },
-  { track: 'Je joue de la musique', artist: 'Calogero', genre: 'Chanson', color: '#b4a0ff' },
-  { track: 'Music for 18 Musicians', artist: 'Coldcut', genre: 'Electronic', color: '#4affc3' },
-  { track: 'Lullaby Love', artist: 'Roo Panes', genre: 'Folk', color: '#d9b38c' },
+  { track: 'Az egyik ember…', artist: 'Quimby', genre: 'Hungarian alt', color: '#ffd84a' },
 ] as const;
 
 export const stats = [
@@ -638,7 +644,7 @@ export function knowledgeText(): string {
   lines.push('## Bookshelf (favourite books)');
   for (const b of books) lines.push(`- ${b.author}: ${b.title} (read as: ${b.hu}, ${b.year}). ${b.note}`);
   lines.push('');
-  lines.push('## Record crate (favourite tracks, he listens on Tidal in lossless)');
+  lines.push('## Record crate (hi-fi favourites from his Tidal library, listened to in lossless)');
   lines.push(records.map((r) => `${r.artist} – ${r.track}`).join('; '));
   return lines.join('\n');
 }
