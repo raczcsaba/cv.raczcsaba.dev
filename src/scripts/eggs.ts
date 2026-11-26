@@ -54,7 +54,7 @@ export function initEggs() {
     if (e.key.length === 1) {
       typed = (typed + e.key.toLowerCase()).slice(-8);
       if (typed.endsWith('hire')) { spell('HIRE', 6500); window.scrollTo({ top: 0, behavior: 'smooth' }); botSay('Excellent idea. The button is at the bottom. 😉', 5000, 'happy'); typed = ''; }
-      if (typed.endsWith('cook')) { toast('🍲 Pörkölt recipe: onions, patience, sweet paprika, more patience.', 4500); typed = ''; }
+      if (typed.endsWith('read')) { toast('📚 “You have power over your mind, not outside events.” Marcus Aurelius', 4500); typed = ''; }
     }
   });
 

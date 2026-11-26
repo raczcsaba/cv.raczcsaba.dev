@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { person, projects, capabilities, experience, funFacts, stats, marquee, domains, skills } from '../data/profile';
+import { person, projects, capabilities, experience, funFacts, books, records, stats, marquee, domains, skills } from '../data/profile';
 
 const icons: Record<string, string> = {
   ai: '<path d="M12 3v3M12 18v3M4.6 6.6l2.1 2.1M17.3 15.3l2.1 2.1M3 12h3M18 12h3M4.6 17.4l2.1-2.1M17.3 8.7l2.1-2.1"/><circle cx="12" cy="12" r="3.2"/>',
@@ -11,7 +11,7 @@ const icons: Record<string, string> = {
   perf: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z"/>',
   iot: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
   music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
-  chef: '<path d="M6 13.9A4 4 0 0 1 7.5 6a5 5 0 0 1 9 0A4 4 0 0 1 18 13.9V20H6v-6.1ZM6 17h12"/>',
+  book: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14ZM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/>',
   home: '<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10Z"/>',
 };
 const icon = (k: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[k] ?? icons.ai}</svg>`;
@@ -196,7 +196,7 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
         <div class="section__head">
           <div>
             <span class="eyebrow">Off the clock</span>
-            <h2 class="h2" id="lab-h">Hi-fi, hot pans <em>&amp; hot solder.</em></h2>
+            <h2 class="h2" id="lab-h">Hi-fi, hot solder <em>&amp; heavy books.</em></h2>
           </div>
           <p class="lead">The side projects are where the main projects get their ideas.</p>
         </div>
@@ -224,10 +224,61 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
               <div><h4>A house that listens</h4><p>Offline Hungarian voice assistant, Home Assistant automations, a Proxmox homelab and a wall-tablet dashboard.</p></div>
             </article>
             <article class="card labitem reveal" style="--d:3;--c:#ffbe55">
-              <div class="cap__icon" set:html={icon('chef')} />
-              <div><h4>Weekend chef</h4><p>Slow-cooked Hungarian classics, fermented hot sauces and a strong opinion on paprika sourcing.</p></div>
+              <div class="cap__icon" set:html={icon('book')} />
+              <div><h4>Philosophy on the train</h4><p>Stoics, existentialists and Hungarian essayists. Pull a book off the shelf below to see why it stuck.</p></div>
             </article>
           </div>
+        </div>
+
+        <div class="shelf card reveal" id="shelf">
+          <div class="shelf__head">
+            <span class="eyebrow">Bookshelf</span>
+            <span class="mono shelf__hint">{books.length} books · click a spine</span>
+          </div>
+          <div class="shelf__body">
+            <div class="shelf__rack" role="listbox" aria-label="Favourite books">
+              {books.map((b, i) => (
+                <button class="spine" type="button" role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i}
+                  style={`--bc:${b.color};--bi:${'ink' in b ? b.ink : '#f3efe6'};--bh:${b.h};--bw:${Math.max(34, Math.min(52, 26 + b.title.length))}px`}
+                  aria-label={`${b.title} by ${b.author}`}>
+                  <span class="spine__t">{b.title}</span>
+                  <span class="spine__a">{b.author.split(' ').slice(-1)[0]}</span>
+                </button>
+              ))}
+            </div>
+            <article class="shelf__card" id="book-card" aria-live="polite">
+              <span class="mono shelf__meta" id="book-meta">{books[0].author} · {books[0].year}</span>
+              <h3 id="book-title">{books[0].title}</h3>
+              <p class="shelf__hu" id="book-hu">{books[0].hu}</p>
+              <p class="shelf__note" id="book-note">{books[0].note}</p>
+            </article>
+          </div>
+          <script type="application/json" id="books-json" set:html={JSON.stringify(books)} />
+        </div>
+
+        <div class="crate card reveal" id="crate">
+          <div class="shelf__head">
+            <span class="eyebrow">Record crate</span>
+            <span class="mono shelf__hint">from his Tidal favourites · lossless, obviously</span>
+          </div>
+          <div class="crate__now" aria-live="polite">
+            <div class="crate__deck" aria-hidden="true"><div class="disc disc--big" id="disc-big" style={`--dc:${records[0].color}`}><i></i></div></div>
+            <div>
+              <span class="mono shelf__meta" id="rec-genre">Now spinning · {records[0].genre}</span>
+              <h3 id="rec-track">{records[0].track}</h3>
+              <p class="shelf__hu" id="rec-artist">{records[0].artist}</p>
+              <a class="btn btn--sm" id="rec-link" target="_blank" rel="noopener" href={`https://tidal.com/search?q=${encodeURIComponent(records[0].artist.split(' · ')[0] + ' ' + records[0].track)}`}>Find on Tidal ↗</a>
+            </div>
+          </div>
+          <div class="crate__row" role="listbox" aria-label="Favourite tracks">
+            {records.map((r, i) => (
+              <button class="crate__item" type="button" role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i} style={`--dc:${r.color}`} aria-label={`${r.track} by ${r.artist}`}>
+                <span class="disc"><i></i></span>
+                <span class="crate__label"><b>{r.track}</b><small>{r.artist}</small></span>
+              </button>
+            ))}
+          </div>
+          <script type="application/json" id="records-json" set:html={JSON.stringify(records)} />
         </div>
       </div>
     </section>

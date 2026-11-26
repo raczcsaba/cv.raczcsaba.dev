@@ -159,6 +159,46 @@ sheet.addEventListener('click', (e) => { if (e.target === sheet || (e.target as 
   });
 }
 
+/* ---------- bookshelf & record crate ---------- */
+function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
+  const items = [...root.querySelectorAll<HTMLElement>(sel)];
+  const pick = (i: number, focus = false) => {
+    items.forEach((b, k) => { b.setAttribute('aria-selected', String(k === i)); b.tabIndex = k === i ? 0 : -1; });
+    if (focus) items[i].focus();
+    items[i].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    onPick(i);
+  };
+  items.forEach((b, k) => { b.tabIndex = k === 0 ? 0 : -1; b.addEventListener('click', () => pick(k)); });
+  root.addEventListener('keydown', (e) => {
+    const cur = items.findIndex((b) => b.getAttribute('aria-selected') === 'true');
+    const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    pick((cur + d + items.length) % items.length, true);
+  });
+}
+{
+  type Book = { title: string; hu: string; author: string; year: number | string; note: string };
+  const books: Book[] = JSON.parse($('#books-json').textContent!);
+  const card = $('#book-card');
+  picker($('.shelf__rack'), '.spine', (i) => {
+    const b = books[i];
+    card.innerHTML = `<span class="mono shelf__meta">${esc(b.author)} · ${esc(String(b.year))}</span><h3>${esc(b.title)}</h3><p class="shelf__hu">${esc(b.hu)}</p><p class="shelf__note">${esc(b.note)}</p>`;
+  });
+}
+{
+  type Rec = { track: string; artist: string; genre: string; color: string };
+  const recs: Rec[] = JSON.parse($('#records-json').textContent!);
+  const big = $('#disc-big'), info = $('#rec-track').parentElement!;
+  picker($('.crate__row'), '.crate__item', (i) => {
+    const r = recs[i];
+    big.style.setProperty('--dc', r.color);
+    big.animate([{ transform: 'scale(0.6) rotate(-90deg)', opacity: 0.2 }, { transform: 'scale(1) rotate(0)', opacity: 1 }], { duration: 500, easing: 'cubic-bezier(0.16,0.84,0.3,1)' });
+    const q = encodeURIComponent(`${r.artist.split(' · ')[0]} ${r.track}`);
+    info.innerHTML = `<span class="mono shelf__meta">Now spinning · ${esc(r.genre)}</span><h3>${esc(r.track)}</h3><p class="shelf__hu">${esc(r.artist)}</p><a class="btn btn--sm" target="_blank" rel="noopener" href="https://tidal.com/search?q=${q}">Find on Tidal ↗</a>`;
+  });
+}
+
 /* ---------- contact form ---------- */
 {
   const form = $<HTMLFormElement>('#contact-form');

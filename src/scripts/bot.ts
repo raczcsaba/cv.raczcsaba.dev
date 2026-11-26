@@ -73,7 +73,7 @@ const sectionLines: Record<string, { t: string; cta?: { label: string; ask: stri
   work: { t: 'These are real, shipped projects. Click any card for the full story.', cta: { label: 'Which one is the hardest?', ask: 'Which of these projects was technically the hardest, and why?' } },
   stack: { t: 'Yes, all of it. He gets bored when a stack is too small. 😄', cta: { label: 'Is he more backend or frontend?', ask: 'Is Csaba more of a backend or a frontend engineer?' } },
   journey: { t: 'From a vocational course in 2022 to leading AI and mobile builds. Not bad, right?' },
-  lab: { t: 'Off-hours mode: hi-fi audio, soldering and slow-cooked pörkölt. 🎧🍲', cta: { label: 'Tell me a secret fun fact', ask: 'Tell me a fun fact about Csaba that is not on the site' } },
+  lab: { t: 'Off-hours mode: lossless audio, hot solder and a shelf of philosophy. 🎧📚', cta: { label: 'Tell me a secret fun fact', ask: 'Tell me a fun fact about Csaba that is not on the site' } },
   contact: { t: 'Have an idea? Tell me in two sentences and I’ll write the message for you. ✍️', cta: { label: 'Help me write it', ask: 'I have a project idea, can you help me shape it and fill in the contact form?' } },
 };
 const seen = new Set<string>();
