@@ -233,13 +233,13 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
         <div class="shelf card reveal" id="shelf">
           <div class="shelf__head">
             <span class="eyebrow">Bookshelf</span>
-            <span class="mono shelf__hint">{books.length} books · click a spine</span>
+            <span class="mono shelf__hint">{books.length} books · pick a spine</span>
           </div>
           <div class="shelf__body">
             <div class="shelf__rack" role="listbox" aria-label="Favourite books">
               {books.map((b, i) => (
                 <button class="spine" type="button" role="option" aria-selected={i === 0 ? 'true' : 'false'} data-i={i}
-                  style={`--bc:${b.color};--bh:${b.h};--bw:${Math.max(34, Math.min(52, 26 + b.title.length))}px`}
+                  style={`--bc:${b.color};--bh:${b.h};--bw:${Math.max(34, Math.min(52, 26 + b.title.length))}px;--fs:${b.title.length > 24 ? 9.5 : b.title.length > 18 ? 10.5 : 12}px`}
                   aria-label={`${b.title} by ${b.author}`}>
                   <span class="spine__t">{b.title}</span>
                   <span class="spine__a">{b.author.split(' ').slice(-1)[0]}</span>
@@ -259,7 +259,7 @@ const filterKeys: (keyof typeof domains)[] = ['ai', 'mobile', 'web', 'backend', 
         <div class="crate card reveal" id="crate">
           <div class="shelf__head">
             <span class="eyebrow">Record crate</span>
-            <span class="mono shelf__hint">from his Tidal favourites · swipe or use the controls</span>
+            <span class="mono shelf__hint">from his Tidal library · swipe or use the controls</span>
           </div>
           <div class="cf">
             <div class="cf__row" id="cf-row" role="listbox" aria-label="Favourite tracks" tabindex="0">

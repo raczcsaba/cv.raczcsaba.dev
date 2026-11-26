@@ -228,13 +228,13 @@ function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
       const d = (el.offsetLeft + el.offsetWidth / 2 - mid) / step;
       const a = Math.abs(d);
       if (a < bestD) { bestD = a; best = k; }
-      const c = Math.min(a, 3);
+      const c = Math.min(a, 5);
       const pile = -d * step * (1 - spread);              // all discs collapse onto the centre one
       const ease = Math.sign(d) * Math.min(a, 1) * -step * 0.12; // tuck neighbours slightly behind
-      el.style.transform = `translateX(${pile + ease}px) translateZ(${-c * 90}px) rotateY(${Math.max(-1, Math.min(1, d)) * -38 * spread}deg) scale(${1 - c * 0.08})`;
+      el.style.transform = `translateX(${pile + ease}px) translateZ(${-c * 70}px) rotateY(${Math.max(-1, Math.min(1, d)) * -38 * spread}deg) scale(${1 - c * 0.06})`;
       el.style.zIndex = String(100 - Math.round(a * 10));
-      el.style.filter = `brightness(${1 - c * 0.22})`;
-      el.style.opacity = String(a > 3.6 ? 0 : 1);
+      el.style.filter = `brightness(${1 - c * 0.15})`;
+      el.style.opacity = String(Math.max(0, Math.min(1, 5.5 - a)));
     });
     select(best);
   }
@@ -251,6 +251,8 @@ function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
     else if (e.key === 'Enter' && e.target === row) play.click();
   });
+  // Bitsy's speech bubble sits bottom-right, right over the player controls: get it out of the way
+  $('.player').addEventListener('pointerenter', () => document.getElementById('bubble')?.classList.remove('on'));
   go(Math.floor(n / 2), false);
   layout();
 }
