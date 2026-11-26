@@ -124,10 +124,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
   gap: 4px;
   padding: 6px;
   border-radius: 999px;
-  background: rgba(12 14 19 / 0.62);
+  background: rgba(10 12 16 / 0.92);
   border: 1px solid var(--line);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
   box-shadow: 0 10px 40px -12px rgba(0 0 0 / 0.6);
   transition: transform 0.5s var(--ease-out), opacity 0.4s;
 }

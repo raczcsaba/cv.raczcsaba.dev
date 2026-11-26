@@ -1,19 +1,21 @@
 ---
-import { SITE, person, projects, experience, skills, domains, type DomainKey } from '../data/profile';
-// CV lead projects: the site's featured ones plus two strong team / backend roles
-const lead = new Set(['vybex', 'voice-ordering', 'abigel', 'booking']);
-const featured = projects.filter((p) => lead.has(p.id));
+import { SITE, person, projects, experience, skills, domains, stats, type DomainKey } from '../data/profile';
+// Page 1: three lead projects next to the skills sidebar. Page 2: every other project, full width.
+const lead = ['vybex', 'voice-ordering', 'abigel'];
+const featured = lead.map((id) => projects.find((p) => p.id === id)!);
 const isSide = (p: (typeof projects)[number]) => /side|open source/i.test(p.client);
-const other = projects.filter((p) => !lead.has(p.id) && !isSide(p));
-const side = projects.filter((p) => !lead.has(p.id) && isSide(p));
+const other = projects.filter((p) => !lead.includes(p.id) && !isSide(p));
+const side = projects.filter((p) => !lead.includes(p.id) && isSide(p));
 const order: DomainKey[] = ['ai', 'backend', 'web', 'mobile', 'cloud', 'iot'];
 const byDomain = order.map((d) => ({
   label: domains[d].label,
-  items: skills.filter((s) => s.d === d && s.level >= 3).sort((a, b) => b.level - a.level),
+  top: skills.filter((s) => s.d === d && s.level >= 4).sort((a, b) => b.level - a.level),
+  also: skills.filter((s) => s.d === d && s.level === 3),
 }));
 const work = experience.filter((e) => !/qualification|school/i.test(e.title));
 const edu = experience.filter((e) => /qualification|school/i.test(e.title));
 const title = `${person.name} · CV · ${person.title}`;
+const host = (u: string) => u.replace(/^https?:\/\//, '');
 ---
 <!doctype html>
 <html lang="en">
@@ -21,123 +23,181 @@ const title = `${person.name} · CV · ${person.title}`;
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title}</title>
-  <meta name="description" content={`One-page CV of ${person.name}, ${person.title} in ${person.location}.`} />
+  <meta name="description" content={`CV of ${person.name}, ${person.title} in ${person.location}.`} />
   <link rel="canonical" href={`${SITE}/cv/`} />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate" type="text/plain" href="/llms.txt" />
   <style is:global>
     @font-face { font-family: Inter; src: url(/fonts/inter-latin-wght-normal.woff2) format('woff2'); font-weight: 100 900; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
     @font-face { font-family: Inter; src: url(/fonts/inter-latin-ext-wght-normal.woff2) format('woff2'); font-weight: 100 900; unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-    @page { size: A4; margin: 12mm 13mm; }
+    @page { size: A4; margin: 0; }
+    :root { --ink: #14161b; --ink2: #3b4048; --mute: #6b7280; --line: #e4e6ea; --acc: #0b8a9e; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { background: #e9ebef; }
-    body { font: 9.4pt/1.42 Inter, system-ui, sans-serif; color: #15171c; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .page { width: 210mm; min-height: 297mm; margin: 24px auto; padding: 12mm 13mm; background: #fff; box-shadow: 0 10px 40px #0002; }
-    @media print { html { background: #fff; } .page { margin: 0; padding: 0; width: auto; min-height: 0; box-shadow: none; } .noprint { display: none !important; } }
+    body { font: 8.5pt/1.42 Inter, system-ui, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     a { color: inherit; text-decoration: none; }
-    header { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: end; padding-bottom: 5mm; border-bottom: 2px solid #15171c; }
-    h1 { font-size: 26pt; line-height: 1; letter-spacing: -0.03em; font-weight: 800; }
-    .role { margin-top: 2mm; font-size: 11.5pt; font-weight: 600; color: #4b5563; }
-    .role b { background: linear-gradient(90deg, #7ac70c, #0aa5c2); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .contact { text-align: right; font-size: 8.6pt; line-height: 1.6; color: #374151; }
-    .contact b { color: #15171c; }
-    .lede { margin: 4mm 0 1mm; font-size: 10pt; color: #2b2f36; max-width: 165mm; }
-    .cols { display: grid; grid-template-columns: 1fr 56mm; gap: 8mm; margin-top: 4mm; }
-    h2 { font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: #6b7280; margin: 4mm 0 2mm; display: flex; align-items: center; gap: 2mm; }
-    h2 { break-after: avoid; }
-    h2::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
-    .item { break-inside: avoid; margin-bottom: 2.6mm; }
-    .item h3 { font-size: 9.8pt; font-weight: 700; display: flex; justify-content: space-between; gap: 3mm; }
-    .item h3 span { font-weight: 500; color: #6b7280; font-size: 8.4pt; white-space: nowrap; }
-    .item .meta { font-size: 8.4pt; color: #4b5563; margin: .3mm 0 .8mm; }
-    .item ul { padding-left: 3.6mm; }
-    .item li { margin: .3mm 0; }
-    .stack { font-size: 7.8pt; color: #4b5563; margin-top: .6mm; }
-    .stack i { font-style: normal; display: inline-block; padding: .2mm 1.6mm; border: 1px solid #e5e7eb; border-radius: 99px; margin: .4mm .6mm 0 0; }
-    aside .group { margin-bottom: 2.6mm; break-inside: avoid; }
-    aside .group b { display: block; font-size: 8.4pt; margin-bottom: .8mm; }
-    aside .group p { font-size: 8.2pt; color: #374151; }
-    aside .group small { display: block; font-size: 7.6pt; color: #6b7280; }
-    .skills { display: flex; flex-wrap: wrap; gap: .8mm; }
-    .skills i { font-style: normal; white-space: nowrap; font-size: 7.6pt; line-height: 1.3; padding: .25mm 1.5mm; border-radius: 99px; background: #f3f4f6; color: #374151; }
-    .skills i.top { background: #15171c; color: #fff; }
-    .legend { font-size: 7pt; color: #9ca3af; margin: -1mm 0 2mm; }
-    .more { display: grid; grid-template-columns: 1fr 1fr; column-gap: 8mm; }
-    .more .item { margin-bottom: 2.4mm; }
-    .more .item p.sum { font-size: 8.6pt; }
-    .more .stack { margin-top: .3mm; }
-    .bar { position: fixed; top: 14px; right: 14px; display: flex; gap: 8px; }
-    .bar a { font: 600 13px Inter, sans-serif; padding: 9px 14px; border-radius: 99px; background: #15171c; color: #c3ff4a; }
-    .bar a + a { background: #fff; color: #15171c; border: 1px solid #d1d5db; }
-    footer { margin-top: 3mm; font-size: 7.6pt; color: #9ca3af; display: flex; justify-content: space-between; }
+    .sheet { width: 210mm; min-height: 296.5mm; margin: 0 auto 24px; padding: 11mm 14mm 8mm; background: #fff; box-shadow: 0 10px 40px #0002; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+    .sheet::before { content: ''; position: absolute; inset: 0 0 auto; height: 2.2mm; background: linear-gradient(90deg, #7ac70c, #0aa5c2); }
+
+    header { display: grid; grid-template-columns: 1fr auto; gap: 8mm; align-items: end; }
+    h1 { font-size: 24pt; line-height: 1; letter-spacing: -0.03em; font-weight: 800; }
+    .role { margin-top: 2mm; font-size: 11pt; font-weight: 600; color: var(--ink2); }
+    .role b { color: var(--acc); font-weight: 700; }
+    .contact { text-align: right; font-size: 8.4pt; line-height: 1.6; color: var(--ink2); }
+    .contact b { color: var(--ink); }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); margin: 4mm 0 3mm; border-block: 1px solid var(--line); }
+    .stats div { padding: 1.5mm 0 1.5mm 3mm; border-left: 1px solid var(--line); }
+    .stats div:first-child { border-left: 0; padding-left: 0; }
+    .stats b { font-size: 13pt; font-weight: 800; letter-spacing: -0.02em; display: block; line-height: 1.1; }
+    .stats span { font-size: 7.6pt; color: var(--mute); }
+    .lede { font-size: 9pt; line-height: 1.45; color: var(--ink2); }
+
+    .cols { display: grid; grid-template-columns: 1fr 60mm; gap: 8mm; margin-top: 1mm; flex: 1; }
+    aside { border-left: 1px solid var(--line); padding-left: 6mm; }
+    h2 { font-size: 7.6pt; letter-spacing: .16em; text-transform: uppercase; color: var(--acc); font-weight: 700; margin: 4mm 0 2mm; break-after: avoid; }
+    .item { break-inside: avoid; margin-bottom: 2.8mm; }
+    .item h3 { font-size: 9.4pt; font-weight: 700; display: flex; justify-content: space-between; align-items: baseline; gap: 3mm; }
+    .item h3 span { font-weight: 500; color: var(--mute); font-size: 8.2pt; white-space: nowrap; }
+    .meta { font-size: 8.3pt; color: var(--mute); margin: .2mm 0 1mm; }
+    .item ul { padding-left: 3.4mm; color: var(--ink2); }
+    .item li { margin: .2mm 0; }
+    .item li::marker { color: var(--acc); }
+    .foot { font-size: 7.8pt; color: var(--mute); margin-top: 1mm; display: flex; flex-wrap: wrap; gap: 0 3mm; }
+    .foot a { color: var(--acc); font-weight: 600; }
+    .foot a::before { content: '↗ '; }
+    .stack { font-size: 7.8pt; color: var(--mute); margin-top: .8mm; }
+
+    .group { margin-bottom: 2mm; break-inside: avoid; }
+    .group b { display: block; font-size: 8pt; margin-bottom: .7mm; }
+    .chips { display: flex; flex-wrap: wrap; gap: .8mm; }
+    .chips i { font-style: normal; white-space: nowrap; font-size: 7pt; line-height: 1.3; padding: .15mm 1.4mm; border-radius: 99px; background: #eef0f3; color: var(--ink); }
+    .group small { display: block; font-size: 7.4pt; color: var(--mute); margin-top: .9mm; line-height: 1.4; }
+    .group p { font-size: 8.2pt; color: var(--ink2); }
+
+    .grid { columns: 2; column-gap: 9mm; }
+    .grid .item { margin-bottom: 1.7mm; }
+    .grid .sum { color: var(--ink2); }
+    .grid h2 { column-span: all; }
+    .grid h2:first-child { margin-top: 0; }
+    footer { margin-top: auto; padding-top: 2mm; border-top: 1px solid var(--line); font-size: 7.6pt; color: var(--mute); display: flex; justify-content: space-between; }
+    footer a { color: var(--acc); font-weight: 600; }
+
+    .bar { position: sticky; top: 0; z-index: 5; display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; margin-bottom: 12px; background: #e9ebef; box-shadow: 0 4px 14px #0000000f; border-bottom: 1px solid #d6d9de; }
+    .bar a { font: 600 13px/1 Inter, sans-serif; padding: 11px 16px; border-radius: 99px; background: var(--ink); color: #c3ff4a; }
+    .bar a + a { background: #fff; color: var(--ink); border: 1px solid #cfd3d9; }
+
+    @media screen and (prefers-reduced-motion: no-preference) {
+      .sheet > * { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
+      .sheet > :nth-child(2) { animation-delay: .06s; } .sheet > :nth-child(3) { animation-delay: .12s; } .sheet > :nth-child(n+4) { animation-delay: .18s; }
+      @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+    }
+    @media screen and (max-width: 860px) {
+      html { background: #fff; }
+      body { font-size: 15px; }
+      .sheet { width: auto; height: auto; overflow: visible; margin: 0; padding: 22px 18px 28px; box-shadow: none; }
+      .sheet + .sheet { padding-top: 0; }
+      .sheet + .sheet::before { display: none; }
+      header, .cols { grid-template-columns: 1fr; gap: 0; } .grid { columns: 1; }
+      .contact { text-align: left; margin-top: 12px; font-size: 14px; line-height: 2; }
+      h1 { font-size: 34px; } .role { font-size: 16px; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stats div:nth-child(3) { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); } .stats div:nth-child(4) { border-top: 1px solid var(--line); }
+      .stats b { font-size: 22px; } .stats span, .meta, .stack, .foot, .item h3 span, .group small { font-size: 13px; }
+      .stats div { padding: 10px 0 10px 12px; }
+      .lede { font-size: 16px; }
+      h2 { font-size: 12px; margin: 26px 0 12px; }
+      .item { margin-bottom: 20px; } .item h3 { font-size: 17px; flex-wrap: wrap; } .item ul { padding-left: 18px; }
+      .foot a { padding: 6px 0; display: inline-block; }
+      aside { border: 0; padding: 0; }
+      .group b { font-size: 14px; } .chips i { font-size: 13px; padding: 4px 10px; } .chips { gap: 6px; } .group p { font-size: 14px; }
+      footer { flex-direction: column; gap: 6px; font-size: 13px; padding-top: 14px; }
+      .bar { justify-content: center; padding: 10px 12px; margin: 0; background: #fff; }
+      .bar a { padding: 13px 16px; font-size: 14px; }
+    }
+    @media print {
+      html { background: #fff; }
+      .sheet { margin: 0; box-shadow: none; break-after: page; }
+      .sheet:last-child { break-after: auto; }
+      .noprint { display: none !important; }
+    }
   </style>
 </head>
 <body>
   <nav class="bar noprint"><a href={person.pdf} download>Download PDF</a><a href="/">← Interactive site</a></nav>
-  <main class="page">
-    <header>
-      <div>
-        <h1>{person.name}</h1>
-        <p class="role"><b>{person.title}</b> · Voice AI · Web · Mobile · Edge</p>
+  <main>
+    <section class="sheet">
+      <header>
+        <div>
+          <h1>{person.name}</h1>
+          <p class="role"><b>{person.title}</b> · Voice AI · Web · Mobile</p>
+        </div>
+        <div class="contact">
+          <b><a href={`mailto:${person.email}`}>{person.email}</a></b><br />
+          <a href={SITE}>{host(SITE)}</a> · <a href={person.github}>{host(person.github)}</a><br />
+          {person.location} · remote / hybrid<br />
+          {person.languages.map((l) => `${l.name} (${l.level.split(' ')[0]})`).join(' · ')}
+        </div>
+      </header>
+      <div class="stats">{stats.map((s) => <div><b>{s.n}{s.suffix}</b><span>{s.label}</span></div>)}</div>
+      <p class="lede">{person.short} {person.available}.</p>
+      <div class="cols">
+        <div>
+          <h2>Experience</h2>
+          {work.map((e) => (
+            <div class="item">
+              <h3>{e.title}<span>{e.when}</span></h3>
+              <p class="meta">{e.org}</p>
+              {e.points ? <ul>{e.points.map((p) => <li>{p}</li>)}</ul> : <p class="sum">{e.text}</p>}
+            </div>
+          ))}
+          <h2>Selected projects</h2>
+          {featured.map((p) => (
+            <div class="item">
+              <h3>{p.name}<span>{p.period}</span></h3>
+              <p class="meta">{p.client} · {p.role}</p>
+              <ul>{p.highlights.slice(0, 3).map((h) => <li>{h}</li>)}</ul>
+              <p class="foot"><span>{p.stack.slice(0, 7).join(' · ')}</span>{p.links?.map((l) => <a href={l.url}>{l.label}</a>)}</p>
+            </div>
+          ))}
+        </div>
+        <aside>
+          <h2>Skills</h2>
+          {byDomain.map((g) => (
+            <div class="group">
+              <b>{g.label}</b>
+              <p class="chips">{g.top.map((s) => <i>{s.name}</i>)}</p>
+              {g.also.length > 0 && <small>Also: {g.also.map((s) => s.name).join(', ')}</small>}
+            </div>
+          ))}
+          <h2>Education</h2>
+          {edu.map((e) => <div class="group"><b>{e.title}</b><p>{e.org}{/^\d/.test(e.when) && `, ${e.when}`}</p></div>)}
+        </aside>
       </div>
-      <div class="contact">
-        <b><a href={`mailto:${person.email}`}>{person.email}</a></b><br />
-        <a href={SITE}>{SITE.replace('https://', '')}</a> · <a href={person.github}>{person.github.replace('https://', '')}</a><br />
-        {person.location} · remote / hybrid<br />
-        {person.languages.map((l) => `${l.name} (${l.level.split(' ')[0]})`).join(' · ')}
-      </div>
-    </header>
-    <p class="lede">{person.short} {person.available}.</p>
+    </section>
 
-    <div class="cols">
-      <section>
-        <h2>Experience</h2>
-        {work.map((e) => (
-          <div class="item"><h3>{e.title}<span>{e.when}</span></h3><p class="meta">{e.org}</p><p>{e.text}</p></div>
-        ))}
-        <h2>Selected projects</h2>
-        {featured.map((p) => (
+    <section class="sheet">
+      <div class="grid">
+        <h2>More client projects</h2>
+        {other.map((p) => (
           <div class="item">
             <h3>{p.name}<span>{p.period}</span></h3>
             <p class="meta">{p.client} · {p.role}</p>
-            <ul>{p.highlights.slice(0, 3).map((h) => <li>{h}</li>)}</ul>
-            <p class="stack">{p.stack.slice(0, 7).map((s) => <i>{s}</i>)}</p>
+            <p class="sum">{p.summary}</p>
+            <p class="foot"><span>{p.stack.slice(0, 4).join(' · ')}</span>{p.links?.map((l) => <a href={l.url}>{l.label}</a>)}</p>
           </div>
         ))}
-      </section>
-      <aside>
-        <h2>Skills</h2>
-        <p class="legend">Dark = daily driver</p>
-        {byDomain.map((g) => (
-          <div class="group"><b>{g.label}</b><p class="skills">{g.items.map((s) => <i class:list={{ top: s.level >= 5 }}>{s.name}</i>)}</p></div>
+        <h2>Side projects & open source</h2>
+        {side.map((p) => (
+          <div class="item">
+            <h3>{p.name}<span>{p.period}</span></h3>
+            <p class="meta">{p.client} · {p.role}</p>
+            <p class="sum">{p.summary}</p>
+            <p class="foot"><span>{p.stack.slice(0, 4).join(' · ')}</span>{p.links?.map((l) => <a href={l.url}>{l.label}</a>)}</p>
+          </div>
         ))}
-        <h2>Education</h2>
-        {edu.map((e) => <div class="group"><b>{e.title}</b><p>{e.org}</p>{/^\d/.test(e.when) && <small>{e.when}</small>}</div>)}
-      </aside>
-    </div>
-    <h2>More client projects</h2>
-    <section class="more">
-      {other.map((p) => (
-        <div class="item">
-          <h3>{p.name}<span>{p.period}</span></h3>
-          <p class="meta">{p.client} · {p.role}</p>
-          <p class="sum">{p.summary}</p>
-          <p class="stack">{p.stack.slice(0, 6).map((s) => <i>{s}</i>)}</p>
-        </div>
-      ))}
+      </div>
+      <footer><span>Interactive version, live AI assistant and full project details: <a href={SITE}>{host(SITE)}</a></span><span>{person.name} · {new Date().getFullYear()}</span></footer>
     </section>
-    <h2>Side projects & open source</h2>
-    <section class="more">
-      {side.map((p) => (
-        <div class="item">
-          <h3>{p.name}<span>{p.period}</span></h3>
-          <p class="meta">{p.client} · {p.role}</p>
-          <p class="sum">{p.summary}</p>
-          <p class="stack">{p.stack.slice(0, 6).map((s) => <i>{s}</i>)}</p>
-        </div>
-      ))}
-    </section>
-    <footer><span>Interactive version, live AI assistant and all projects: {SITE.replace('https://', '')}</span><span>{new Date().getFullYear()}</span></footer>
   </main>
 </body>
 </html>

@@ -457,6 +457,12 @@ export const experience = [
     org: 'ProCat Solutions Kft. · Budapest',
     text:
       'Software studio building web, mobile, SaaS and voice-AI products for Hungarian and international clients. 15+ shipped projects; often the sole or lead developer from architecture to store release.',
+    points: [
+      'Sole or lead developer on most engagements: architecture, database, API, web / mobile client and the App Store / Google Play release.',
+      'Voice AI and LLM products since 2025: a real-time phone-ordering agent for restaurants and a multi-tenant voice-agent platform.',
+      'Lead mobile developer of the Eventus® field-service apps used by crews of MVM and other Hungarian utilities (via MXC Software).',
+      'Clients and products include Roksh / ALDI, YoloAI, TGS Hungary, Catch, Custode, Vector, URBAN HOME and Magyar Gabona.',
+    ],
   },
   {
     when: '2022 — 2023',
