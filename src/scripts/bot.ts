@@ -30,10 +30,20 @@ function mood(m: Mood, ms = 1800) {
   if (m) bot.classList.add(m);
   if (m && ms) setTimeout(() => bot.classList.remove(m), ms);
 }
+// the bubble sits bottom-right: never let it cover on-page controls (the record player's buttons)
+function bubbleWouldCover() {
+  const b = bubble.getBoundingClientRect();
+  return [...document.querySelectorAll('.player__ctrl')].some((el) => {
+    const r = el.getBoundingClientRect();
+    return r.right > b.left - 20 && r.left < b.right + 20 && r.bottom > b.top - 20 && r.top < b.bottom + 20;
+  });
+}
+addEventListener('scroll', () => { if (bubble.classList.contains('on') && bubbleWouldCover()) bubble.classList.remove('on'); }, { passive: true });
 export function botSay(html: string, ms = 5000, m: Mood = '', cta?: { label: string; ask: string }) {
   if (open) return;
   clearTimeout(bubbleTimer);
   bubble.innerHTML = html + (cta ? `<br><button type="button" data-ask="${cta.ask.replace(/"/g, '&quot;')}">${cta.label}</button>` : '');
+  if (bubbleWouldCover()) return void bubble.classList.remove('on');
   bubble.classList.add('on');
   bot.classList.add('talk');
   setTimeout(() => bot.classList.remove('talk'), Math.min(1600, html.length * 28));

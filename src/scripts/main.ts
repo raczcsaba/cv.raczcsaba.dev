@@ -194,10 +194,13 @@ function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
   const items = $$<HTMLButtonElement>('.cf__item', row);
   const play = $<HTMLAnchorElement>('#rec-play');
   const n = items.length;
-  let cur = -1, spread = reduced ? 1 : 0, raf = 0;
+  const clamp = (v: number, lo = 0, hi = n - 1) => Math.min(hi, Math.max(lo, v));
+  // Position is driven by us (not native scroll-snap): `pos` eases toward `target`, both in disc units.
+  let cur = -1, spread = reduced ? 1 : 0, raf = 0, last = 0;
+  let pos = Math.floor(n / 2), target = pos;
+  const stepPx = () => items[0].offsetWidth * 0.58;
 
-  const centerOf = (i: number) => items[i].offsetLeft + items[i].offsetWidth / 2 - row.clientWidth / 2;
-  const go = (i: number, smooth = true) => row.scrollTo({ left: centerOf((i + n) % n), behavior: smooth && !reduced ? 'smooth' : 'auto' });
+  const go = (i: number) => { target = ((Math.round(i) % n) + n) % n; if (reduced) pos = target; queue(); };
 
   function select(i: number) {
     if (i === cur) return;
@@ -215,46 +218,97 @@ function picker(root: HTMLElement, sel: string, onPick: (i: number) => void) {
     play.setAttribute('aria-label', `Play ${r.track} on Tidal`);
   }
 
-  function layout() {
+  function layout(t: number) {
     raf = 0;
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016);
+    last = t;
+    if (!dragging) {
+      pos += (target - pos) * (1 - Math.exp(-dt * 11));
+      if (Math.abs(target - pos) < 0.002) pos = target;
+    }
     if (!reduced) { // stack -> fan out as the card scrolls into view
       const top = crate.getBoundingClientRect().top;
       spread = Math.min(1, Math.max(0, (innerHeight * 0.95 - top) / (innerHeight * 0.55)));
     }
-    const mid = row.scrollLeft + row.clientWidth / 2;
-    const step = items.length > 1 ? items[1].offsetLeft - items[0].offsetLeft : 1;
-    let best = 0, bestD = Infinity;
+    const step = stepPx();
     items.forEach((el, k) => {
-      const d = (el.offsetLeft + el.offsetWidth / 2 - mid) / step;
+      const d = k - pos;
       const a = Math.abs(d);
-      if (a < bestD) { bestD = a; best = k; }
       const c = Math.min(a, 5);
-      const pile = -d * step * (1 - spread);              // all discs collapse onto the centre one
       const ease = Math.sign(d) * Math.min(a, 1) * -step * 0.12; // tuck neighbours slightly behind
-      el.style.transform = `translateX(${pile + ease}px) translateZ(${-c * 70}px) rotateY(${Math.max(-1, Math.min(1, d)) * -38 * spread}deg) scale(${1 - c * 0.06})`;
+      el.style.transform = `translateX(${(d * step + ease) * spread}px) translateZ(${-c * 70}px) rotateY(${Math.max(-1, Math.min(1, d)) * -38 * spread}deg) scale(${1 - c * 0.06})`;
       el.style.zIndex = String(100 - Math.round(a * 10));
       el.style.filter = `brightness(${1 - c * 0.15})`;
       el.style.opacity = String(Math.max(0, Math.min(1, 5.5 - a)));
     });
-    select(best);
+    select(clamp(Math.round(pos)));
+    if (pos !== target || dragging) queue(); else last = 0;
   }
-  const queue = () => { if (!raf) raf = requestAnimationFrame(layout); };
-  row.addEventListener('scroll', queue, { passive: true });
+  function queue() { if (!raf) raf = requestAnimationFrame(layout); }
   addEventListener('scroll', queue, { passive: true });
-  addEventListener('resize', () => { go(cur, false); queue(); });
+  addEventListener('resize', queue);
 
-  items.forEach((b, k) => b.addEventListener('click', () => (k === cur ? play.click() : go(k))));
-  $('#rec-prev').addEventListener('click', () => go(cur - 1));
-  $('#rec-next').addEventListener('click', () => go(cur + 1));
+  // mouse wheel / trackpad: one notch = one disc; vertical wheel passes to the page at either end
+  let wheelT = 0;
+  row.addEventListener('wheel', (e) => {
+    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    const delta = (horiz ? e.deltaX : e.deltaY) * (e.deltaMode === 1 ? 33 : 1);
+    if (!delta) return;
+    if (!horiz && ((delta < 0 && target <= 0) || (delta > 0 && target >= n - 1))) return;
+    e.preventDefault();
+    target = clamp(target + Math.sign(delta) * Math.min(1, Math.abs(delta) / 100));
+    clearTimeout(wheelT);
+    wheelT = window.setTimeout(() => { target = clamp(Math.round(target)); queue(); }, 120);
+    if (reduced) pos = target;
+    queue();
+  }, { passive: false });
+
+  // drag / swipe (mouse, pen, touch); vertical page scrolling on touch stays native via touch-action: pan-y
+  let dragging = false, downX = 0, downPos = 0, lastX = 0, lastT = 0, vel = 0, moved = false, pid = -1;
+  row.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    pid = e.pointerId; downX = lastX = e.clientX; lastT = e.timeStamp; downPos = pos; vel = 0; moved = false;
+  });
+  row.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== pid) return;
+    if (!moved && Math.abs(e.clientX - downX) < 6) return;
+    if (!moved) { moved = dragging = true; row.setPointerCapture(pid); row.classList.add('drag'); }
+    const step = stepPx();
+    let p = downPos - (e.clientX - downX) / step;
+    if (p < 0) p *= 0.35; else if (p > n - 1) p = n - 1 + (p - n + 1) * 0.35; // rubber-band past the ends
+    const dt = Math.max(1, e.timeStamp - lastT);
+    vel = 0.8 * (-(e.clientX - lastX) / step / dt) + 0.2 * vel; // discs per ms
+    lastX = e.clientX; lastT = e.timeStamp;
+    pos = target = p;
+    queue();
+  });
+  const release = (e: PointerEvent) => {
+    if (e.pointerId !== pid) return;
+    pid = -1;
+    if (!dragging) return;
+    dragging = false; row.classList.remove('drag');
+    if (e.timeStamp - lastT > 80) vel = 0; // held still before letting go: no fling
+    target = clamp(Math.round(pos + Math.max(-3, Math.min(3, vel * 120))));
+    queue();
+  };
+  row.addEventListener('pointerup', release);
+  row.addEventListener('pointercancel', release);
+  // a drag ends with a click on whatever disc is under the pointer: swallow it
+  row.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+
+  items.forEach((b, k) => b.addEventListener('click', () => (k === cur && target === cur ? play.click() : go(k))));
+  $('#rec-prev').addEventListener('click', () => go(target - 1));
+  $('#rec-next').addEventListener('click', () => go(target + 1));
   row.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); go(cur + 1); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(target + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(target - 1); }
+    else if (e.key === 'Home') { e.preventDefault(); go(0); }
+    else if (e.key === 'End') { e.preventDefault(); go(n - 1); }
     else if (e.key === 'Enter' && e.target === row) play.click();
   });
   // Bitsy's speech bubble sits bottom-right, right over the player controls: get it out of the way
   $('.player').addEventListener('pointerenter', () => document.getElementById('bubble')?.classList.remove('on'));
-  go(Math.floor(n / 2), false);
-  layout();
+  queue();
 }
 
 /* ---------- contact form ---------- */
